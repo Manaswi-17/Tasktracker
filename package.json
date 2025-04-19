@@ -1,0 +1,16 @@
+{
+    "name": "task-tracker",
+    "version": "1.0.0",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "dotenv": "^16.0.3",
+      "express": "^4.18.2",
+      "mongoose": "^7.0.4",
+      "node-cron": "^3.0.2",
+      "redis": "^4.6.7"
+    }
+  }
+  
