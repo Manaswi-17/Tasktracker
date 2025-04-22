@@ -20,16 +20,38 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get All Tasks (cached)
+// Get All Tasks with Pagination (cached)
 router.get('/', async (req, res) => {
-  const cached = await client.get(CACHE_KEY);
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const cached = await client.get(`${CACHE_KEY}_${page}_${limit}`);
   if (cached) {
     return res.json(JSON.parse(cached));
   }
-  const tasks = await Task.find().sort({ priority: -1 });
-  await client.set(CACHE_KEY, JSON.stringify(tasks));
-  res.json(tasks);
+
+  try {
+    const totalTasks = await Task.countDocuments();
+    const tasks = await Task.find()
+      .sort({ priority: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const result = {
+      currentPage: page,
+      totalPages: Math.ceil(totalTasks / limit),
+      totalTasks,
+      tasks,
+    };
+
+    await client.set(`${CACHE_KEY}_${page}_${limit}`, JSON.stringify(result));
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 
 // Update Task Status
 router.patch('/:id/status', async (req, res) => {

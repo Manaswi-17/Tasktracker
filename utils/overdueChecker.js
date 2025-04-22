@@ -8,7 +8,7 @@ async function checkOverdueTasks() {
       task.status = 'overdue';
       task.history.push({ status: 'overdue' });
       await task.save();
-      console.log(`⚠️ Task "${task.title}" is now overdue!`);
+      console.log(` Task "${task.title}" is now overdue!`);
     }
   }
 }
